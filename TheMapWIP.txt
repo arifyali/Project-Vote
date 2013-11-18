@@ -1,0 +1,15 @@
+
+library("maps")
+install.packages("mapdata")
+library("mapdata")
+
+ArrowMap = function(DF){
+
+DF$longitude = DF$longitude/1000000
+DF$latitude = DF$latitude/1000000
+
+map("usa",col = "gray", fill = TRUE, boundary=FALSE)
+sapply(unique(FinalDF$state),function(z){
+  map('county',z,add=TRUE,col="white",lwd=0.25)
+})
+arrows(dog$longitude,DF$latitude,y1=DF$latitude+.05,angle=25,length=.02)

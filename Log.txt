@@ -1,0 +1,56 @@
+The Averagers:
+Matthew Iannone, Arif Ali, Teresa Tenfelder, Sean Linehan
+
+Note: there may be additional notes on contributions on the r file itself.
+Log:
+Tuesday, 11/27/2012 4:30pm- All members met after class; assigned part 1 tasks and worked together on loading data for all parts
+
+Wednesday, 11/28/2012 12:09am- Preliminary Census Data completed by Arif Ali, data organized by County-33 lines  
+
+Wednesday, 11/28/2012 1:20pm-Census 2010 data officially done
+
+
+
+Wednesday, 11/28/2012 4:30pm- Teresa did the 2012 data! :D the .R file is in the 
+DropBox folder; just source it and call parse2012results().  Do we have a convention 
+for the county names?  all lowercase?  remove dashes/periods?  Please advise :] also 
+look at my awesome data fraaaaame AVERAGERS FTW. sorry guys I'm really sleep-deprived 
+and excited to have this done.
+
+11/29 (1:25 AM) [Matt] I don't think we need to make careful logs of when we worked,
+just when we worked together. Anyways, I created a file "FinalProject.R" where we can 
+start combining our code tomorrow (well technically today) after class.
+I added the code to extract the 2004 vote data (2004ElecFuncs.txt). I'll see if I can
+get the GML extraction done by the end of class tomorrow...done or not we should be
+able to begin merging tomorrow though.
+
+11/29 2pm - Arif, Matt, Teresa met in Bechtel during class time to work on merging 
+our data and identifying "problem counties", which are listed below:
+
+[[de kalb]] / dekalb
+[[miami-dade]] / dade
+[[de witt]]
+[[de baca]]
+[[de soto]]
+le sueur
+le flore
+la paz
+la plata
+la porte
+la salle
+la moure
+la crosse
+jo daviess
+
+
+
+11/30 5pm - Matt here, just finished processing geo data...I also created a short function 
+called "CountyFix" which we can use to quickly make single county corrections prior to merging
+
+12/1 3:41pm - Group met up to attempt to merge all data. Data from Census was refined in order to make merging easier.
+
+12/3 10:42pm: Arif atm, K nearest Neighbor was attempted and almost completed, issues involve a difference between numbers and winning party..
+
+12/7 (Teresa) - hey guys, I saved the final data frame to FinalDF.rda so we don't have to keep sourcing the FinalProject.R file which takes a super-long time..
+
+12/9 - Group finished the plots, credit to Teresa for her amazing maps plots

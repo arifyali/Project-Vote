@@ -1,0 +1,36 @@
+LoadRaw2004 = function(URL){
+  
+  # URL is the URL to the 2004 election data
+  # Function performs initial processing of data into
+  # a reader-friendly dataframe
+  
+  raw2004dat = read.table(url(URL),stringsAsFactors=FALSE)
+  names(raw2004dat) = t(raw2004dat)[,1]
+  raw2004dat = raw2004dat[-1,]
+  for (i in 2:ncol(raw2004dat)) {
+    raw2004dat[,i]=as.numeric(raw2004dat[,i])
+  }
+  rownames(raw2004dat)=1:nrow(raw2004dat)
+  return(raw2004dat)
+}
+
+ProcessRaw2004 = function(raw2004){
+  
+  # raw2004 is the output from LoadRaw2004
+  # This function further processes the data to facilitate merging
+  # It also renames Dade county in Florida
+  
+  countysplit = strsplit(raw2004$countyName,",")
+  raw2004$county = sapply(1:length(countysplit),
+                  function(z){      countysplit[[z]][2]       } )
+  raw2004$state = sapply(1:length(countysplit),
+                  function(z){      countysplit[[z]][1]       } )
+  raw2004 = raw2004[,-1]
+  
+  raw2004$county[raw2004$county=="dade"&raw2004$state=="florida"] = "miami-dade"
+  
+  return(raw2004)
+}
+
+Elec04 = ProcessRaw2004(LoadRaw2004(
+  "http://www.stat.berkeley.edu/users/nolan/data/Project2012/countyVotes2004.txt"))

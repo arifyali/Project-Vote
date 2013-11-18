@@ -1,0 +1,111 @@
+Geo Data - In Progress
+
+
+
+
+LoadRawGeo = function(URL){
+  
+  # URL is the URL to the geographic data
+  # Function loads the data and formats it from XML into a list
+  # where each entry is a state
+  
+  library("XML")
+  rawGeoXML = xmlParse(URL)
+  StateNodes = getNodeSet(rawGeoXML,"//state")
+
+  rawGeoDat=lapply(1:length(StateNodes),
+                   function(z){    xmlValue(StateNodes[[z]])    }     )
+  
+  names(rawGeoDat) = sapply(1:length(rawGeoDat),
+                            function(z){      xmlValue(StateNodes[[z]][[1]])     }  )
+  names(rawGeoDat) = tolower(gsub("([\n])|(^[[:space:]]*)|([[:space:]]*$)",
+                                  "",names(rawGeoDat)))
+  return(rawGeoDat)
+}
+
+
+
+
+ProcessRawGeo = function(rawGeo){
+  
+  # rawGeo is the list generated from LoadRawGeo
+  # This function processes the list of character vectors into
+  # a list of data frames, one per state
+  
+  states = names(rawGeo)
+  rawGeo = gsub("[[:upper:]]{3,}","",rawGeo) 
+  rawGeo = strsplit(rawGeo,"(\n[[:space:]]*\n[[:space:]]*)|(\n[[:space:]]*)")
+
+  for (i in 1:length(rawGeo)){
+    countycount = (length(rawGeo[[i]]) - 1) / 3
+    rawGeo[[i]] = data.frame(
+      rep(states[i],countycount),
+      rawGeo[[i]][seq(2,length=countycount,by=3)],
+      rawGeo[[i]][seq(3,length=countycount,by=3)],
+      rawGeo[[i]][seq(4,length=countycount,by=3)]     )
+    colnames(rawGeo[[i]]) = c("state","county","longitude","latitude")
+  }
+  
+  return(rawGeo)
+}
+
+
+
+
+elimCounty = function(geoDat){
+  
+  ## geoDat is the output from ProcessRawGeo
+  ## This function helps standardize names (lowercase, no "county", no ".")
+  
+  
+  for(i in 1:length(geoDat)){
+    geoDat[[i]]$county = tolower(geoDat[[i]]$county)
+    geoDat[[i]]$county = gsub(
+      "([[:space:]]county)|([[:space:]]parish)","",geoDat[[i]]$county)
+    geoDat[[i]]$county = gsub(
+      "([[:space:]]census[[:space:]]area)|([[:space:]]borough)|[.]","",geoDat[[i]]$county)
+  }
+  return(geoDat)
+}
+
+
+ToDF = function(Geolist){
+
+  # This function takes a list of data frames (Geolist) and merges them
+  
+  DF = merge(Geolist[[1]],Geolist[[2]],all=TRUE)
+  for (i in 1:(length(Geolist)-2)){
+    DF=merge(DF,Geolist[[i+2]],all=TRUE)
+  }
+  return(DF)
+}
+
+
+CountyFix = function(DF,oldcount,newcount,state){
+  
+  # This function can be applied to fix single county names in a DF
+  # DF is the data frame to be operated on, oldcount is current county name
+  # newcount is desired county name, state is county state
+  
+  DF$county[DF$county==oldcount & DF$state==state] = newcount
+  return(DF)
+}
+
+
+IDState = function(DF){
+
+  # This function creates a standardized ID column
+  # DF is any id with a "county" and "state column
+  
+  DF$ID = paste(DF$county,DF$state)
+  return(DF)
+}
+
+
+GeoDat = ToDF(elimCounty(ProcessRawGeo(LoadRawGeo(
+  "http://www.stat.berkeley.edu/users/nolan/data/Project2012/counties.gml" ))))
+GeoDat = CountyFix(GeoDat,"dekalb","de kalb","alabama")
+GeoDat = CountyFix(GeoDat,"dekalb","de kalb","illinois")
+GeoDat = CountyFix(GeoDat,"dekalb","de kalb","indiana")
+GeoDat = IDState(GeoDat)
+
